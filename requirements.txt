@@ -1,0 +1,7 @@
+flask
+flask-restful
+flasgger
+gunicorn
+xmltodict
+pandas
+requests
