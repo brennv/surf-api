@@ -4,7 +4,7 @@ host = os.getenv('SURF_API_HOST', '127.0.0.1:5000')
 scheme = [x for x in [os.getenv('SURF_API_SCHEME')] if x]
 
 template = {
-  # "host": "surf.vonapp.co",
+  # "host": "surfcast.vonapp.co",
   "host": host,
   # "schemes": ["https"],
   "schemes": scheme,
@@ -12,7 +12,7 @@ template = {
   "swagger": "2.0",
   "info": {
     "title": "Surf Forecast API",
-    "description": "API endpoints for surf.vonapp.co",
+    "description": "API endpoints for " + host,
     "version": "0.1.0"
   },
   "basePath": "/",

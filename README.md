@@ -2,7 +2,7 @@
 
 RESTful json-formatted NOAA Marine Weather forecasts and surf spot metadata
 
-See: [surf.vonapp.co](http://surf.vonapp.co)
+See: [surfcast.vonapp.co](http://surfcast.vonapp.co)
 
 ## Endpoints
 
