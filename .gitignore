@@ -99,3 +99,9 @@ ENV/
 
 # mypy
 .mypy_cache/
+
+# misc
+*.zip
+Untitled Folder/
+Archive
+.DS_Store
