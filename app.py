@@ -14,7 +14,8 @@ swagger = Swagger(app, template=template, config=swagger_config)
 api.add_resource(Health, '/api/health')
 
 api.add_resource(Point, '/api/point/<string:lat>/<string:lon>')
-'''
+
+''' in-progress
 api.add_resource(PointSwell, '/api/point/<string:lat>/<string:lon>/swell')
 api.add_resource(PointSwellDirection, '/api/point/<string:lat>/<string:lon>/swell/direction')
 api.add_resource(PointSwellHeight, '/api/point/<string:lat>/<string:lon>/swell/height')
@@ -36,4 +37,4 @@ def page_not_found(e):
 
 
 if __name__ == '__main__':
-    app.run(debug=debug, threaded=threaded)
+    app.run(debug=debug, threaded=False)
