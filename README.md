@@ -12,7 +12,7 @@ GET **/api/point/{lat,lon}** Forecast for point
 
 #### Example point forecast response
 
-```json
+```
 {
   "area": "28NM WSW San Francisco CA",
   "latitude": "37.59",
