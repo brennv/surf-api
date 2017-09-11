@@ -65,7 +65,7 @@ def get_forecast(response):
     # data['source'] = get_metadata(response)
     norm_len = len(forecast['wave_height'])
     df = pd.DataFrame()
-    for k, v in data.items():
+    for k, v in forecast.items():
         df[k] = v[:norm_len] + [''] * (norm_len - len(v))
     records = df.to_dict(orient='records')
     data = get_metadata(response)
