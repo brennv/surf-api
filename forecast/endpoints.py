@@ -1,5 +1,5 @@
-from .data import (get_data, get_forecast, get_swell, get_wave, get_wind_direction,
-                   get_wind_speed)
+from .data import (get_response, get_data, get_forecast, get_swell, get_wave,
+                   get_wind_direction, get_wind_speed)
 # get_swell_direction, get_swell_height, get_swell_period, get_wind,
 from flask_restful import Resource
 
@@ -40,10 +40,15 @@ class Point(Resource):
          200:
            description: Point forecast
         """
-        response = get_data(lat, lon)
-        return get_forecast(response), 200
+        response = get_response(lat, lon)
+        if response.status_code == 200:
+            data = get_data(response)
+            result = get_forecast(data)
+        else:
+            result = {}
+        return result, response.status_code
 
-'''
+
 class PointSwell(Resource):
     def get(self, lat, lon):
         """
@@ -66,9 +71,15 @@ class PointSwell(Resource):
          200:
            description: Swell direction, height, period
         """
-        return get_swell(lat, lon), 200
+        response = get_response(lat, lon)
+        if response.status_code == 200:
+            data = get_data(response)
+            result = get_swell(data)
+        else:
+            result = {}
+        return result, response.status_code
 
-
+'''
 class PointSwellDirection(Resource):
     def get(self, lat, lon):
         """
@@ -91,7 +102,7 @@ class PointSwellDirection(Resource):
          200:
            description: Swell direction
         """
-        return get_swell_direction(lat, lon), 200
+        return get_swell_direction(lat, lon), response.status_code
 
 
 class PointSwellHeight(Resource):
@@ -116,7 +127,7 @@ class PointSwellHeight(Resource):
          200:
            description: Swell height
         """
-        return get_swell_height(lat, lon), 200
+        return get_swell_height(lat, lon), response.status_code
 
 
 class PointSwellPeriod(Resource):
@@ -141,8 +152,8 @@ class PointSwellPeriod(Resource):
          200:
            description: Swell period
         """
-        return get_swell_period(lat, lon), 200
-
+        return get_swell_period(lat, lon), response.status_code
+'''
 
 class PointWave(Resource):
     def get(self, lat, lon):
@@ -166,9 +177,15 @@ class PointWave(Resource):
          200:
            description: Wave height
         """
-        return get_wave(lat, lon), 200
+        response = get_response(lat, lon)
+        if response.status_code == 200:
+            data = get_data(response)
+            result = get_wave(data)
+        else:
+            result = {}
+        return result, response.status_code
 
-
+'''
 class PointWind(Resource):
     def get(self, lat, lon):
         """
@@ -191,8 +208,8 @@ class PointWind(Resource):
          200:
            description: Wind direction, speed
         """
-        return get_wind(lat, lon), 200
-
+        return get_wind(lat, lon), response.status_code
+'''
 
 class PointWindDirection(Resource):
     def get(self, lat, lon):
@@ -216,7 +233,13 @@ class PointWindDirection(Resource):
          200:
            description: Wind direction
         """
-        return get_wind_direction(lat, lon), 200
+        response = get_response(lat, lon)
+        if response.status_code == 200:
+            data = get_data(response)
+            result = get_wind_direction(data)
+        else:
+            result = {}
+        return result, response.status_code
 
 
 class PointWindSpeed(Resource):
@@ -241,5 +264,10 @@ class PointWindSpeed(Resource):
          200:
            description: Wind speed
         """
-        return get_wind_speed(lat, lon), 200
-'''
+        response = get_response(lat, lon)
+        if response.status_code == 200:
+            data = get_data(response)
+            result = get_wind_speed(data)
+        else:
+            result = {}
+        return result, response.status_code

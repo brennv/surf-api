@@ -2,13 +2,21 @@
 
 RESTful json-formatted NOAA Marine Weather forecasts and surf spot metadata
 
-See: [surfcast.vonapp.co](http://surfcast.vonapp.co)
+See: [surf.vonapp.co](http://surf.vonapp.co)
 
 ## Endpoints
 
 ### point: forecasts by latitude, longitude
 
 GET **/api/point/{lat,lon}** Forecast for point
+
+GET **/api/point/{lat,lon}/swell** Swell direction, height, period
+
+GET **/api/point/{lat,lon}/wave** Wave height
+
+GET **/api/point/{lat,lon}/wind/direction** Wind direction
+
+GET **/api/point/{lat,lon}/wind/speed** Wind speed
 
 #### Example point forecast response
 
@@ -60,21 +68,13 @@ GET **/api/health** API health check
 
 ### point
 
-GET **/api/point/{lat,lon}/swell** Swell direction, height, period
-
 GET **/api/point/{lat,lon}/swell/direction** Swell direction
 
 GET **/api/point/{lat,lon}/swell/height** Swell height
 
 GET **/api/point/{lat,lon}/swell/period** Swell period
 
-GET **/api/point/{lat,lon}/wave** Wave height
-
 GET **/api/point/{lat,lon}/wind** Wind direction, speed
-
-GET **/api/point/{lat,lon}/wind/direction** Wind direction
-
-GET **/api/point/{lat,lon}/wind/speed** Wind speed
 
 ### spots: list surf spots
 
