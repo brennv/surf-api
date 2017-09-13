@@ -1,6 +1,5 @@
-from .data import (get_response, get_data, get_forecast, get_swell, get_wave,
+from .data import (get_response, parse_data, get_forecast, get_swell, get_wave,
                    get_wind_direction, get_wind_speed)
-# get_swell_direction, get_swell_height, get_swell_period, get_wind,
 from flask_restful import Resource
 
 
@@ -42,7 +41,7 @@ class Point(Resource):
         """
         response = get_response(lat, lon)
         if response.status_code == 200:
-            data = get_data(response)
+            data = parse_data(response)
             result = get_forecast(data)
         else:
             result = {}
@@ -73,7 +72,7 @@ class PointSwell(Resource):
         """
         response = get_response(lat, lon)
         if response.status_code == 200:
-            data = get_data(response)
+            data = parse_data(response)
             result = get_swell(data)
         else:
             result = {}
@@ -179,7 +178,7 @@ class PointWave(Resource):
         """
         response = get_response(lat, lon)
         if response.status_code == 200:
-            data = get_data(response)
+            data = parse_data(response)
             result = get_wave(data)
         else:
             result = {}
@@ -235,7 +234,7 @@ class PointWindDirection(Resource):
         """
         response = get_response(lat, lon)
         if response.status_code == 200:
-            data = get_data(response)
+            data = parse_data(response)
             result = get_wind_direction(data)
         else:
             result = {}
@@ -266,7 +265,7 @@ class PointWindSpeed(Resource):
         """
         response = get_response(lat, lon)
         if response.status_code == 200:
-            data = get_data(response)
+            data = parse_data(response)
             result = get_wind_speed(data)
         else:
             result = {}
