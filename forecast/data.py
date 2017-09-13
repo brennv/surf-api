@@ -17,25 +17,8 @@ def get_response(lat, lon):
     return response
 
 
-def get_data(response):
+def parse_data(response):
     return xmltodict.parse(response.text)
-
-
-def include_time(data, values, label):
-    times = get_times(data)
-    times = times[:len(values)]
-    return [{'time': t, label: v} for t, v in dict(zip(times, values)).items()]
-
-
-def normalize_records(data, norm):
-    """ Reshape a dict of lists as a list of dicts. If list lengths are
-        inconsistent, normalize lists with a non-value. """
-    norm_len = len(data[norm])
-    df = pd.DataFrame()
-    for k, v in data.items():
-        df[k] = v[:norm_len] + [''] * (norm_len - len(v))
-    records = df.to_dict(orient='records')
-    return records
 
 
 def get_metadata(data):
@@ -54,40 +37,52 @@ def get_times(data):
     return data['dwml']['data']['time-layout']['start-valid-time']
 
 
-def get_wind_direction(data, orient='records'):
-    values = data['dwml']['data']['parameters']['direction']['value']
-    if orient == 'list':
-        return values
-    else:
-        result = get_metadata(data)
-        result['forecast'] = include_time(data, values, 'wind_direction')
-        return result
+def add_metadata(data, values, label):
+    """ Wrap a list values with metadata and inlude value times. """
+    result = get_metadata(data)
+    times = get_times(data)
+    times = times[:len(values)]
+    result['forecast'] = [{'time': t, label: v} for t, v in
+                          dict(zip(times, values)).items()]
+    return result
 
 
-def get_wind_speed(data, orient='records'):
-    values = data['dwml']['data']['parameters']['wind-speed'][0]['value']
-    if orient == 'list':
-        return values
-    else:
-        result = get_metadata(data)
-        result['forecast'] = include_time(data, values, 'wind_speed')
-        return result
+def normalize_records(data, norm):
+    """ Reshape a dict of lists as a list of dicts. If list lengths are
+        inconsistent, normalize lists with a non-value. """
+    norm_len = len(data[norm])
+    df = pd.DataFrame()
+    for k, v in data.items():
+        df[k] = v[:norm_len] + [''] * (norm_len - len(v))
+    records = df.to_dict(orient='records')
+    return records
 
 
-def get_wave(data, orient='records'):
+def get_wind_direction(data, meta=True):
+    result = data['dwml']['data']['parameters']['direction']['value']
+    if meta:
+        result = add_metadata(data, result, 'wind_direction')
+    return result
+
+
+def get_wind_speed(data, meta=True):
+    result = data['dwml']['data']['parameters']['wind-speed'][0]['value']
+    if meta:
+        result = add_metadata(data, result, 'wind_speed')
+    return result
+
+
+def get_wave(data, meta=True):
     waves = data['dwml']['data']['parameters']['water-state']['waves']
     cut = len(waves) // 2
-    values = [w['value'] for w in waves[:cut] if isinstance(w['value'], str)]
+    result = [w['value'] for w in waves[:cut] if isinstance(w['value'], str)]
     # wave2_heights = [w['value'] for w in waves[cut:] if isinstance(w['value'], str)]
-    if orient == 'list':
-        return values
-    else:
-        result = get_metadata(data)
-        result['forecast'] = include_time(data, values, 'wave_height')
-        return result
+    if meta:
+        result = add_metadata(data, result, 'wave_height')
+    return result
 
 
-def get_swell(data, orient='records'):
+def get_swell(data, meta=True):
     swell = data['dwml']['data']['parameters']['water-state']['swell']
     swell_directions, swell_heights, swell_periods = [], [], []
     for s in swell:
@@ -108,20 +103,17 @@ def get_swell(data, orient='records'):
                 'swell_direction': swell_directions,
                 'swell_height': swell_heights,
                 'swell_period': swell_periods}
-    if orient == 'list':
-        return forecast
-    else:
-        result = get_metadata(data)
-        result['forecast'] = normalize_records(forecast, norm='swell_height')
-        return result
+    if meta:
+        forecast, results = get_metadata(data), forecast
+        forecast['forecast'] = normalize_records(results, norm='swell_height')
+    return forecast
 
 
 def get_forecast(data):
-    forecast = get_swell(data, orient='list')
-    forecast['wind_direction'] = get_wind_direction(data, orient='list')
-    forecast['wind_speed'] = get_wind_speed(data, orient='list')
-    forecast['wave_height'] = get_wave(data, orient='list')
-    # TODO 'wave2_height': wave2_heights,
-    result = get_metadata(data)
-    result['forecast'] = normalize_records(forecast, norm='wave_height')
-    return result
+    forecast = get_metadata(data)
+    results = get_swell(data, meta=False)
+    results['wind_direction'] = get_wind_direction(data, meta=False)
+    results['wind_speed'] = get_wind_speed(data, meta=False)
+    results['wave_height'] = get_wave(data, meta=False)
+    forecast['forecast'] = normalize_records(results, norm='wave_height')
+    return forecast
