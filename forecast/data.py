@@ -33,8 +33,11 @@ def get_metadata(data):
     return metadata
 
 
-def get_times(data):
-    return data['dwml']['data']['time-layout']['start-valid-time']
+def get_times(data, pretty=False):
+    times = data['dwml']['data']['time-layout']['start-valid-time']
+    if pretty:
+        times = [t[5:-9].replace('T', ' ') for t in times]
+    return times
 
 
 def add_metadata(data, values, label):

@@ -1,23 +1,25 @@
 from forecast.config import swagger_config, template, debug, threaded
 from forecast.endpoints import (Health, Point, PointSwell, PointWindDirection,
                                 PointSwell, PointWindSpeed, PointWave)
-# PointSwellDirection, PointSwellHeight, PointSwellPeriod, PointWind
-from flask import Flask, jsonify, redirect
+from forecast.data import (get_response, parse_data, get_wave, get_times,
+                           get_metadata)
+from flask import Flask, jsonify, redirect, render_template, request, session
 from flask_restful import Api, Resource
 from flasgger import Swagger
+import uuid
+
 
 app = Flask(__name__)
+app.secret_key = uuid.uuid4().hex
 api = Api(app)
 swagger = Swagger(app, template=template, config=swagger_config)
 
 api.add_resource(Health, '/api/health')
-
 api.add_resource(Point, '/api/point/<string:lat>/<string:lon>')
 api.add_resource(PointSwell, '/api/point/<string:lat>/<string:lon>/swell')
 api.add_resource(PointWindDirection, '/api/point/<string:lat>/<string:lon>/wind/direction')
 api.add_resource(PointWindSpeed, '/api/point/<string:lat>/<string:lon>/wind/speed')
 api.add_resource(PointWave, '/api/point/<string:lat>/<string:lon>/wave')
-
 
 ''' in-progress
 api.add_resource(PointSwellDirection, '/api/point/<string:lat>/<string:lon>/swell/direction')
@@ -26,10 +28,48 @@ api.add_resource(PointSwellPeriod, '/api/point/<string:lat>/<string:lon>/swell/p
 api.add_resource(PointWind, '/api/point/<string:lat>/<string:lon>/wind')
 '''
 
+blue_lt = 'rgba(54, 162, 235, 0.2)'
+blue_dk = 'rgba(54, 162, 235, 1.0)'
+grey = 'rgba(220, 220, 220, 0.2)'
+pm = ['20', '21', '22', '23', '00', '01', '02', '03', '04']
 
-@app.route('/')
-def index():
-    return redirect('/api/spec/')
+
+@app.route('/', methods=['GET', 'POST'])
+def chart():
+    coord = session.get('coord', '37.583, -122.952')
+    times, borders, fills = [], [], []
+    lines, meta = {}, {}
+    error = ''
+    if request.form:
+        coord = request.form['coord'] or coord
+    session['coord'] = coord
+    try:
+        lat, lon = coord.strip().split(',')
+        lat, lon = lat.strip(), lon.strip()
+        response = get_response(lat, lon)
+        if response.status_code == 200:
+            data = parse_data(response)
+            values = get_wave(data, meta=False)
+            times = get_times(data, pretty=True)[:len(values)]
+            lines = {'Wave height (ft)': values}
+            borders = [blue_dk for t in times]
+            fills = [blue_lt for t in times]
+            # fills = [grey if t[6:-3] in pm else blue_lt for t in times]
+            meta = get_metadata(data)
+    except Exception as e:
+        print('error:', e)
+        if 'not enough values to unpack' in str(e):
+            error = 'Please use a comma beteen numbers.'
+        elif 'mismatched tag' in str(e) or 'water-state' in str(e):
+            error = 'No near-shore ocean forecast available for that coordinate.'
+        else:
+            error = 'No near-shore ocean forecast available.'
+            # raise e
+    if error:
+        error += ' The expected decimal coordinate is: latitude, longitude'
+    return render_template('chart.html', times=times, data=lines,
+                           borders=borders, fills=fills, error=error,
+                           meta=meta, coord=coord)
 
 
 @app.errorhandler(404)
