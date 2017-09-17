@@ -19,12 +19,14 @@
   <div class="container" style="padding-top: 10px; padding-right: 20px;">
 
   <div class="row">
-    <h4 style="text-align: center;">Surf forecast {{ meta['area'] or 'unknown' }}</h4>
+    <h4 style="text-align: center;">Surf forecast {{ meta['area'] or '' }}</h4>
   </div>
 
+  {% if not error %}
   <div class="row">
     <canvas id="myChart" width="400" height="200"></canvas>
   </div>
+  {% endif %}
 
   <div class="row">
     <div class="one-half column">
@@ -46,6 +48,7 @@
     </div>
   </div>
 
+  {% if not error %}
   <script>
   var ctx = document.getElementById("myChart").getContext('2d');
   var myChart = new Chart(ctx, {
@@ -76,6 +79,8 @@
       }
   });
   </script>
+  {% endif %}
+
 </div>
 </body>
 </html>
