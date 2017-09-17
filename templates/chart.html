@@ -9,6 +9,7 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <link rel="shortcut icon" type="image/x-icon" href="static/images/favicon-tree.ico" />
+  <link href='//fonts.googleapis.com/css?family=Raleway:400,300,600' rel='stylesheet' type='text/css'>
   <link href="{{ url_for('static', filename='css/normalize.css') }}" rel="stylesheet">
   <link href="{{ url_for('static', filename='css/skeleton.css') }}" rel="stylesheet">
   <script src="{{ url_for('static', filename='js/Chart.min.js') }}"></script>
@@ -18,7 +19,7 @@
   <div class="container" style="padding-top: 10px; padding-right: 20px;">
 
   <div class="row">
-    <h4 style="text-align: center;">Wave forecast {{ meta['area'] or 'unknown' }}</h4>
+    <h4 style="text-align: center;">Surf forecast {{ meta['area'] or 'unknown' }}</h4>
   </div>
 
   <div class="row">
@@ -52,13 +53,26 @@
       data: {
         labels: {{ times|safe }},
         datasets: [
-          {% for k, v in data.items() %}
-              { label: "{{ k|safe }}", data: {{ v|safe }}, borderColor: "{{ borders }}", backgroundColor: "{{ fills }}" },
-          {% endfor %}
+          { label: "Wave hieight (feet)", data: {{ data['wave_height']|safe }},
+            borderColor: "rgba(54, 162, 235, 1)", backgroundColor: "rgba(54, 162, 235, 0.2)",
+            pointRadius: 0, yAxisID: 'left-y-axis' },
+          { label: "Wind speed (knots)", data: {{ data['wind_speed']|safe }},
+            borderColor: "rgba(161, 170, 175, 1)", backgroundColor: "rgba(161, 170, 175, 0.2)",
+            pointRadius: 0, yAxisID: 'right-y-axis' },
         ]
       },
       options: {
-        scales: { yAxes: [{ ticks: {beginAtZero: true} }] },
+        scales: {
+          yAxes: [
+            { id: 'left-y-axis', type: 'linear', position: 'left',
+              ticks: {beginAtZero: true, max: {{ y_max['wave_height']|safe }}, stepSize: 2 },
+              scaleLabel: {display: true, labelString: 'Wave hieight (feet)', fontColor: '#1589d5'} },
+            { id: 'right-y-axis', type: 'linear', position: 'right',
+              ticks: {beginAtZero: true, max: {{ y_max['wind_speed']|safe }}, stepSize: 5 },
+              scaleLabel: {display: true, labelString: 'Wind speed (knots)'} },
+          ],
+        },
+        legend: {display: false},
       }
   });
   </script>
