@@ -52,6 +52,8 @@ def chart():
             # pm = ['20', '21', '22', '23', '00', '01', '02', '03', '04']
             # fills = [grey if t[6:-3] in pm else blue_lt for t in times]
             meta = get_metadata(data)
+            meta['update'] = meta['update'][:-9].replace('T', ' ')
+            meta['source'] = 'weather.gov/' + meta['source'].split('/')[-1]
     except Exception as e:
         print('error:', e)
         if 'not enough values to unpack' in str(e):

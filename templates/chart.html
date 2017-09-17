@@ -36,8 +36,8 @@
 
     <div class="one-half column">
       {% if not error %}
-        <br>Updated: {{ meta['update'] }} {{ meta['latitude'] }} {{ meta['longitude'] }}
-        <br>Data source: <a href="{{ meta['source'] }}">{{ meta['source'] }}</a>
+        <br>Updated: {{ meta['update'] }}
+        <br>Data source: <a href="{{ 'https://www.' + meta['source'] }}">{{ meta['source'] }}</a>
         <br>API: <a href="https://surf.vonapp.co/api/spec">surf.vonapp.co/api/spec</a>
       {% else %}
         <br><strong style="color: red;">{{ error }}</strong>
