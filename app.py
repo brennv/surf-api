@@ -28,11 +28,6 @@ api.add_resource(PointSwellPeriod, '/api/point/<string:lat>/<string:lon>/swell/p
 api.add_resource(PointWind, '/api/point/<string:lat>/<string:lon>/wind')
 '''
 
-blue_lt = 'rgba(54, 162, 235, 0.2)'
-blue_dk = 'rgba(54, 162, 235, 1.0)'
-grey = 'rgba(220, 220, 220, 0.2)'
-pm = ['20', '21', '22', '23', '00', '01', '02', '03', '04']
-
 
 @app.route('/', methods=['GET', 'POST'])
 def chart():
@@ -52,8 +47,9 @@ def chart():
             values = get_wave(data, meta=False)
             times = get_times(data, pretty=True)[:len(values)]
             lines = {'Wave height (ft)': values}
-            borders = [blue_dk for t in times]
-            fills = [blue_lt for t in times]
+            borders = 'rgba(54, 162, 235, 1.0)'  # [blue_dk for t in times]
+            fills = 'rgba(54, 162, 235, 0.2)'  # [blue_lt for t in times]
+            # pm = ['20', '21', '22', '23', '00', '01', '02', '03', '04']
             # fills = [grey if t[6:-3] in pm else blue_lt for t in times]
             meta = get_metadata(data)
     except Exception as e:
