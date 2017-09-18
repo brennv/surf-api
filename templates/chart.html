@@ -23,7 +23,7 @@
   </div>
 
   {% if not error %}
-  <div class="row" style="padding-left: 8px; padding-right: 6px; padding-bottom: 16px;">
+  <div class="row">
     <canvas id="ValueChart" width="400" height="120"></canvas>
   </div>
   <div class="row">
@@ -82,6 +82,9 @@
             }]
         },
         legend: {display: false},
+        layout: {padding: {left: {{ scale['left_pad']|safe }}, right: 6, top: 0, bottom: 16}},
+
+
       }
   });
   var ctx = document.getElementById("DirectionChart").getContext('2d');

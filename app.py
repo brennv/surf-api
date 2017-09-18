@@ -59,11 +59,13 @@ def chart():
             direction_max = min([int(math.ceil(direction_max / 20.0)) * 20, 360])
             wave_max = max([int(x) for x in swell['wave_height']]) + 1
             wind_max = max([int(x) for x in swell['wind_speed']]) + 1
-            scale = {'wave_height_max': int(math.ceil(wave_max / 2.0)) * 2,
+            wave_height_max = int(math.ceil(wave_max / 2.0)) * 2
+            scale = {'wave_height_max': wave_height_max,
                      'wind_speed_max': int(math.ceil(wind_max / 5.0)) * 5,
                      'direction_min': direction_min,
                      'direction_max': direction_max,
-                     'direction_step': (direction_max - direction_min) / 4}
+                     'direction_step': (direction_max - direction_min) / 4,
+                     'left_pad': 8 if wave_height_max >= 10 else 16}
             meta = get_metadata(data)
             meta['update'] = meta['update'][:-9].replace('T', ' ')
             meta['source'] = 'weather.gov/' + meta['source'].split('/')[-1]
