@@ -23,7 +23,7 @@
   </div>
 
   {% if not error %}
-  <div class="row">
+  <div class="row" style="padding-left: 8px; padding-right: 6px; padding-bottom: 16px;">
     <canvas id="ValueChart" width="400" height="120"></canvas>
   </div>
   <div class="row">
@@ -77,6 +77,9 @@
               ticks: {beginAtZero: true, max: {{ scale['wind_speed_max']|safe }}, stepSize: 5 },
               scaleLabel: {display: true, labelString: 'Wind speed (knots)'} },
           ],
+          xAxes: [{
+                display: false
+            }]
         },
         legend: {display: false},
       }
