@@ -60,7 +60,7 @@
         labels: {{ times|safe }},
         datasets: [
           { label: "Wave height (feet)", data: {{ data['wave_height']|safe }},
-            borderColor: "rgba(54, 162, 235, 1)", backgroundColor: "rgba(54, 162, 235, 0)",
+            borderColor: "rgba(54, 162, 235, 1)", backgroundColor: "rgba(54, 162, 235, 0.2)",
             pointRadius: 0, yAxisID: 'left-y-axis' },
           { label: "Wind speed (knots)", data: {{ data['wind_speed']|safe }},
             borderColor: "rgba(161, 170, 175, 1)", backgroundColor: "rgba(161, 170, 175, 0)",

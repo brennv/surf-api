@@ -35,7 +35,7 @@ api.add_resource(PointWind, '/api/point/<string:lat>/<string:lon>/wind')
 def chart():
     coord = session.get('coord', '37.583, -122.952')
     times, borders, fills = [], [], []
-    swell, meta, y_max = {}, {}, {}
+    swell, meta, scale = {}, {}, {}
     error = ''
     if request.form:
         coord = request.form['coord'] or coord
