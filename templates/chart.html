@@ -24,7 +24,10 @@
 
   {% if not error %}
   <div class="row">
-    <canvas id="myChart" width="400" height="200"></canvas>
+    <canvas id="ValueChart" width="400" height="120"></canvas>
+  </div>
+  <div class="row">
+    <canvas id="DirectionChart" width="400" height="80"></canvas>
   </div>
   {% endif %}
 
@@ -50,17 +53,17 @@
 
   {% if not error %}
   <script>
-  var ctx = document.getElementById("myChart").getContext('2d');
-  var myChart = new Chart(ctx, {
+  var ctx = document.getElementById("ValueChart").getContext('2d');
+  var ValueChart = new Chart(ctx, {
       type: 'line',
       data: {
         labels: {{ times|safe }},
         datasets: [
-          { label: "Wave hieight (feet)", data: {{ data['wave_height']|safe }},
-            borderColor: "rgba(54, 162, 235, 1)", backgroundColor: "rgba(54, 162, 235, 0.2)",
+          { label: "Wave height (feet)", data: {{ data['wave_height']|safe }},
+            borderColor: "rgba(54, 162, 235, 1)", backgroundColor: "rgba(54, 162, 235, 0)",
             pointRadius: 0, yAxisID: 'left-y-axis' },
           { label: "Wind speed (knots)", data: {{ data['wind_speed']|safe }},
-            borderColor: "rgba(161, 170, 175, 1)", backgroundColor: "rgba(161, 170, 175, 0.2)",
+            borderColor: "rgba(161, 170, 175, 1)", backgroundColor: "rgba(161, 170, 175, 0)",
             pointRadius: 0, yAxisID: 'right-y-axis' },
         ]
       },
@@ -68,11 +71,41 @@
         scales: {
           yAxes: [
             { id: 'left-y-axis', type: 'linear', position: 'left',
-              ticks: {beginAtZero: true, max: {{ y_max['wave_height']|safe }}, stepSize: 2 },
-              scaleLabel: {display: true, labelString: 'Wave hieight (feet)', fontColor: '#1589d5'} },
+              ticks: {beginAtZero: true, max: {{ scale['wave_height_max']|safe }}, stepSize: 2 },
+              scaleLabel: {display: true, labelString: 'Wave height (feet)', fontColor: '#1589d5'} },
             { id: 'right-y-axis', type: 'linear', position: 'right',
-              ticks: {beginAtZero: true, max: {{ y_max['wind_speed']|safe }}, stepSize: 5 },
+              ticks: {beginAtZero: true, max: {{ scale['wind_speed_max']|safe }}, stepSize: 5 },
               scaleLabel: {display: true, labelString: 'Wind speed (knots)'} },
+          ],
+        },
+        legend: {display: false},
+      }
+  });
+  var ctx = document.getElementById("DirectionChart").getContext('2d');
+  var DirectionChart = new Chart(ctx, {
+      type: 'line',
+      data: {
+        labels: {{ times|safe }},
+        datasets: [
+          { label: "Swell direction", data: {{ data['swell_direction']|safe }},
+            borderColor: "rgba(54, 162, 235, 1)", backgroundColor: "rgba(54, 162, 235, 0)",
+            pointRadius: 0, },
+          { label: "Wind direction", data: {{ data['wind_direction']|safe }},
+            borderColor: "rgba(161, 170, 175, 1)", backgroundColor: "rgba(161, 170, 175, 0)",
+            pointRadius: 0, },
+        ]
+      },
+      options: {
+        scales: {
+          yAxes: [
+            { id: 'left-y-axis', type: 'linear', position: 'left',
+              ticks: {min: {{ scale['direction_min'] }}, max: {{ scale['direction_max'] }}, stepSize: {{ scale['direction_step'] }} },
+              scaleLabel: {display: true, labelString: 'Swell direction', fontColor: '#1589d5'},
+            },
+            { id: 'right-y-axis', type: 'linear', position: 'right',
+              ticks: {min: {{ scale['direction_min'] }}, max: {{ scale['direction_max'] }}, stepSize: {{ scale['direction_step'] }} },
+              scaleLabel: {display: true, labelString: 'Wind direction'},
+            },
           ],
         },
         legend: {display: false},

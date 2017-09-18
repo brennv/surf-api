@@ -2,7 +2,8 @@ from forecast.config import swagger_config, template, debug, threaded
 from forecast.endpoints import (Health, Point, PointSwell, PointWindDirection,
                                 PointSwell, PointWindSpeed, PointWave)
 from forecast.data import (get_response, parse_data, get_wave, get_times,
-                           get_metadata, get_wind_speed)
+                           get_metadata, get_wind_speed, get_wind_direction,
+                           get_swell)
 from flask import Flask, jsonify, redirect, render_template, request, session
 from flask_restful import Api, Resource
 from flasgger import Swagger
@@ -34,7 +35,7 @@ api.add_resource(PointWind, '/api/point/<string:lat>/<string:lon>/wind')
 def chart():
     coord = session.get('coord', '37.583, -122.952')
     times, borders, fills = [], [], []
-    lines, meta, y_max = {}, {}, {}
+    swell, meta, y_max = {}, {}, {}
     error = ''
     if request.form:
         coord = request.form['coord'] or coord
@@ -45,14 +46,24 @@ def chart():
         response = get_response(lat, lon)
         if response.status_code == 200:
             data = parse_data(response)
-            values = get_wave(data, meta=False)
-            times = get_times(data, pretty=True)[:len(values)]
-            lines = {'wave_height': values}
-            lines['wind_speed'] = get_wind_speed(data, meta=False)[:len(values)]
-            wave_max = max([int(x) for x in lines['wave_height']]) + 1
-            wind_max = max([int(x) for x in lines['wind_speed']]) + 1
-            y_max = {'wave_height': int(math.ceil(wave_max / 2.0)) * 2,
-                     'wind_speed': int(math.ceil(wind_max / 5.0)) * 5}
+            waves = get_wave(data, meta=False)
+            times = get_times(data, pretty=True)[:len(waves)]
+            swell = get_swell(data, meta=False)
+            swell['wave_height'] = waves
+            swell['wind_direction'] = get_wind_direction(data, meta=False)[:len(waves)]
+            swell['wind_speed'] = get_wind_speed(data, meta=False)[:len(waves)]
+            swell['swell_direction'] = swell['swell_direction'][:len(waves)]
+            dir_range =[int(x) for x in swell['wind_direction'] + swell['swell_direction']]
+            direction_min, direction_max = min(dir_range) - 20 , max(dir_range) + 1
+            direction_min = max([int(math.ceil(direction_min / 20.0)) * 20, 0])
+            direction_max = min([int(math.ceil(direction_max / 20.0)) * 20, 360])
+            wave_max = max([int(x) for x in swell['wave_height']]) + 1
+            wind_max = max([int(x) for x in swell['wind_speed']]) + 1
+            scale = {'wave_height_max': int(math.ceil(wave_max / 2.0)) * 2,
+                     'wind_speed_max': int(math.ceil(wind_max / 5.0)) * 5,
+                     'direction_min': direction_min,
+                     'direction_max': direction_max,
+                     'direction_step': (direction_max - direction_min) / 4}
             meta = get_metadata(data)
             meta['update'] = meta['update'][:-9].replace('T', ' ')
             meta['source'] = 'weather.gov/' + meta['source'].split('/')[-1]
@@ -67,8 +78,8 @@ def chart():
             # raise e
     if error:
         error += ' The expected decimal coordinate is: latitude, longitude'
-    return render_template('chart.html', times=times, data=lines,
-                           error=error, meta=meta, coord=coord, y_max=y_max)
+    return render_template('chart.html', times=times, data=swell,
+                           error=error, meta=meta, coord=coord, scale=scale)
 
 
 @app.errorhandler(404)
